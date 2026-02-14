@@ -288,25 +288,31 @@
         const img = new Image();
         img.crossOrigin = "anonymous";
         const preview = previewUrl(url);
+        console.log("[loadImage] original:", url);
+        console.log("[loadImage] preview:", preview);
 
         img.onload = () => {
+            console.log("[loadImage] ✅ weserv preview loaded OK");
             mainImage.src = preview;
             mainImage.classList.add("loaded");
             hideLoader();
             downloadBtn.disabled = false;
         };
 
-        img.onerror = () => {
+        img.onerror = (e) => {
+            console.warn("[loadImage] ⚠️ weserv failed, falling back to original", e);
             // Fallback: try original URL without crossOrigin
             const fallback = new Image();
             fallback.onload = () => {
+                console.log("[loadImage] ✅ fallback (original) loaded OK");
                 mainImage.crossOrigin = null;
                 mainImage.src = url;
                 mainImage.classList.add("loaded");
                 hideLoader();
                 downloadBtn.disabled = false;
             };
-            fallback.onerror = () => {
+            fallback.onerror = (e2) => {
+                console.error("[loadImage] ❌ fallback also failed", e2);
                 showError();
                 hideLoader();
             };
@@ -332,8 +338,12 @@
                 const encoded = encodeURIComponent(currentUrl.replace(/^https?:\/\//, ""));
                 fetchUrl = `https://images.weserv.nl/?url=${encoded}`;
             }
+            console.log("[download] fetchUrl:", fetchUrl);
             const res = await fetch(fetchUrl, { mode: "cors" });
+            console.log("[download] response status:", res.status, res.headers.get("content-type"));
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const blob = await res.blob();
+            console.log("[download] blob size:", blob.size, "type:", blob.type);
             const ext = getExtension(currentUrl, blob.type);
             const a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
@@ -342,7 +352,8 @@
             a.click();
             a.remove();
             URL.revokeObjectURL(a.href);
-        } catch {
+        } catch (err) {
+            console.error("[download] ❌ failed, opening in new tab:", err);
             // Fallback: open in new tab
             window.open(currentUrl, "_blank");
         } finally {
