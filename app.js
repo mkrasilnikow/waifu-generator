@@ -274,9 +274,13 @@
     // ── Load image into DOM ──
     function loadImage(url) {
         mainImage.classList.remove("loaded");
+        // Only set crossOrigin for CORS-enabled sources (waifu.im)
+        // waifu.pics CDN doesn't send Access-Control-Allow-Origin
+        const supportsCors = currentApi === "waifuim";
+        mainImage.crossOrigin = supportsCors ? "anonymous" : null;
 
         const img = new Image();
-        img.crossOrigin = "anonymous";
+        if (supportsCors) img.crossOrigin = "anonymous";
 
         img.onload = () => {
             mainImage.src = url;
@@ -299,6 +303,11 @@
 
         downloadBtn.disabled = true;
         try {
+            if (currentApi !== "waifuim") {
+                // waifu.pics doesn't support CORS — open in new tab
+                window.open(currentUrl, "_blank");
+                return;
+            }
             const res = await fetch(currentUrl, { mode: "cors" });
             const blob = await res.blob();
             const ext = getExtension(currentUrl, blob.type);
