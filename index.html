@@ -103,6 +103,32 @@
         </main>
     </div>
 
+    <!-- Fullscreen viewer overlay -->
+    <div class="fullscreen" id="fullscreen">
+        <button class="fullscreen__close" id="fsClose" title="Закрыть (Esc)">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <img class="fullscreen__image" id="fsImage" alt="Waifu" draggable="false">
+        <div class="fullscreen__actions">
+            <button class="btn btn--download" id="fsDownloadBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Скачать
+            </button>
+            <button class="btn btn--next" id="fsNextBtn">
+                Следующая
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

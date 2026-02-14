@@ -416,6 +416,66 @@ body {
     display: block;
 }
 
+/* ── Fullscreen viewer ── */
+
+.fullscreen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, .95);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen.active {
+    display: flex;
+}
+
+.fullscreen__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background .2s;
+    z-index: 210;
+    line-height: 0;
+}
+
+.fullscreen__close:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.fullscreen__image {
+    max-width: 95vw;
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.fullscreen__image.loaded {
+    opacity: 1;
+}
+
+.fullscreen__actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Make the image-wrap clickable (cursor hint) */
+.viewer__image-wrap {
+    cursor: zoom-in;
+}
+
 /* ── Responsive ── */
 
 @media (max-width: 600px) {

@@ -21,6 +21,13 @@
     const sfwSelect  = $("#sfwCategorySelect");
     const nsfwSelect = $("#nsfwCategorySelect");
 
+    // fullscreen
+    const fullscreen   = $("#fullscreen");
+    const fsImage      = $("#fsImage");
+    const fsClose      = $("#fsClose");
+    const fsDownloadBtn = $("#fsDownloadBtn");
+    const fsNextBtn    = $("#fsNextBtn");
+
     // sections
     const waifuimSection   = $("#waifuimTags");
     const waifupicsSection = $("#waifupicsCategories");
@@ -144,13 +151,38 @@
         retryBtn.addEventListener("click", () => fetchImage());
         downloadBtn.addEventListener("click", downloadImage);
 
+        // Fullscreen: open on image click
+        imageWrap.addEventListener("click", (e) => {
+            // Don't open if clicking on error/retry elements
+            if (e.target.closest(".viewer__error") || e.target.closest(".viewer__loader")) return;
+            if (mainImage.classList.contains("loaded")) openFullscreen();
+        });
+
+        // Fullscreen: close
+        fsClose.addEventListener("click", closeFullscreen);
+        fullscreen.addEventListener("click", (e) => {
+            // Close when clicking the dark background, not the image/buttons
+            if (e.target === fullscreen) closeFullscreen();
+        });
+
+        // Fullscreen: next / download
+        fsNextBtn.addEventListener("click", () => fetchImage());
+        fsDownloadBtn.addEventListener("click", downloadImage);
+
         // Keyboard
         document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                if (fullscreen.classList.contains("active")) {
+                    closeFullscreen();
+                } else {
+                    closeFilters();
+                }
+                return;
+            }
             if (e.key === "ArrowRight" || e.key === " ") {
                 e.preventDefault();
                 if (!loading) fetchImage();
             }
-            if (e.key === "Escape") closeFilters();
         });
     }
 
@@ -297,6 +329,7 @@
             mainImage.classList.add("loaded");
             hideLoader();
             downloadBtn.disabled = false;
+            syncFullscreenImage();
         };
 
         img.onerror = (e) => {
@@ -310,6 +343,7 @@
                 mainImage.classList.add("loaded");
                 hideLoader();
                 downloadBtn.disabled = false;
+                syncFullscreenImage();
             };
             fallback.onerror = (e2) => {
                 console.error("[loadImage] ❌ fallback also failed", e2);
@@ -387,6 +421,28 @@
     }
     function hideError() {
         errorMsg.classList.remove("visible");
+    }
+
+    // ── Fullscreen ──
+    function openFullscreen() {
+        fsImage.classList.remove("loaded");
+        fsImage.src = mainImage.src;
+        // Once the browser has the image cached, onload fires immediately
+        fsImage.onload = () => fsImage.classList.add("loaded");
+        fullscreen.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeFullscreen() {
+        fullscreen.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function syncFullscreenImage() {
+        if (!fullscreen.classList.contains("active")) return;
+        fsImage.classList.remove("loaded");
+        fsImage.src = mainImage.src;
+        fsImage.onload = () => fsImage.classList.add("loaded");
     }
 
     // ── Start ──
