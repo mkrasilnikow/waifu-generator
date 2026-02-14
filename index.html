@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waifu Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1 class="header__title">Waifu Generator</h1>
+            <button class="header__filter-btn" id="toggleFilters" title="Фильтры">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="6" x2="20" y2="6"/>
+                    <line x1="8" y1="12" x2="20" y2="12"/>
+                    <line x1="12" y1="18" x2="20" y2="18"/>
+                    <circle cx="6" cy="6" r="2" fill="currentColor"/>
+                    <circle cx="10" cy="12" r="2" fill="currentColor"/>
+                    <circle cx="14" cy="18" r="2" fill="currentColor"/>
+                </svg>
+                <span>Фильтры</span>
+            </button>
+        </header>
+
+        <aside class="filters" id="filtersPanel">
+            <div class="filters__section">
+                <h3 class="filters__heading">Источник API</h3>
+                <div class="filters__options">
+                    <label class="filters__radio">
+                        <input type="radio" name="api" value="waifuim" checked>
+                        <span>waifu.im</span>
+                    </label>
+                    <label class="filters__radio">
+                        <input type="radio" name="api" value="waifupics">
+                        <span>waifu.pics</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filters__section">
+                <h3 class="filters__heading">NSFW</h3>
+                <label class="filters__toggle">
+                    <input type="checkbox" id="nsfwToggle">
+                    <span class="filters__toggle-slider"></span>
+                    <span class="filters__toggle-label">Показывать NSFW</span>
+                </label>
+            </div>
+
+            <!-- waifu.im tags -->
+            <div class="filters__section" id="waifuimTags">
+                <h3 class="filters__heading">Теги (waifu.im)</h3>
+                <div class="filters__tags" id="tagsContainer">
+                    <!-- filled by JS -->
+                </div>
+            </div>
+
+            <!-- waifu.pics categories -->
+            <div class="filters__section filters__section--hidden" id="waifupicsCategories">
+                <h3 class="filters__heading">Категория (waifu.pics)</h3>
+                <select class="filters__select" id="sfwCategorySelect">
+                    <!-- filled by JS -->
+                </select>
+                <select class="filters__select filters__select--hidden" id="nsfwCategorySelect">
+                    <!-- filled by JS -->
+                </select>
+            </div>
+
+            <button class="filters__apply" id="applyFilters">Применить</button>
+        </aside>
+
+        <main class="viewer">
+            <div class="viewer__image-wrap" id="imageWrap">
+                <div class="viewer__loader" id="loader">
+                    <div class="spinner"></div>
+                    <p>Загрузка...</p>
+                </div>
+                <img class="viewer__image" id="mainImage" alt="Waifu" draggable="false">
+                <div class="viewer__error" id="errorMsg">
+                    <p>Не удалось загрузить изображение</p>
+                    <button class="btn btn--retry" id="retryBtn">Повторить</button>
+                </div>
+            </div>
+
+            <div class="viewer__meta" id="metaInfo"></div>
+
+            <div class="viewer__actions">
+                <button class="btn btn--download" id="downloadBtn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Скачать
+                </button>
+                <button class="btn btn--next" id="nextBtn">
+                    Следующая
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
