@@ -35,7 +35,8 @@
     // ── waifu.im tags ──
     const WAIFUIM_SFW_TAGS  = [
         "waifu", "maid", "marin-kitagawa", "mori-calliope",
-        "raiden-shogun", "oppai", "selfies", "uniform", "kamisato-ayaka"
+        "raiden-shogun", "oppai", "selfies", "uniform",
+        "kamisato-ayaka", "genshin-impact"
     ];
     const WAIFUIM_NSFW_TAGS = [
         "ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"
@@ -218,15 +219,15 @@
         }
 
         const res = await fetch(
-            `https://api.waifu.im/search?${params.toString()}`
+            `https://api.waifu.im/images?${params.toString()}`
         );
 
         if (!res.ok) throw new Error(`waifu.im ${res.status}`);
 
         const data = await res.json();
-        if (!data.images || data.images.length === 0) throw new Error("No images");
+        if (!data.items || data.items.length === 0) throw new Error("No images");
 
-        const img = data.images[0];
+        const img = data.items[0];
         currentUrl = img.url;
 
         loadImage(img.url);
@@ -236,8 +237,11 @@
         if (img.tags && img.tags.length > 0) {
             meta += img.tags.map((t) => t.name).join(", ");
         }
-        if (img.artist && img.artist.name) {
-            meta += ` &middot; ${img.artist.name}`;
+        if (img.artists && img.artists.length > 0) {
+            const artist = img.artists[0];
+            if (artist.name) {
+                meta += ` &middot; ${artist.name}`;
+            }
         }
         if (img.source) {
             meta += ` &middot; <a href="${img.source}" target="_blank" rel="noopener">источник</a>`;
