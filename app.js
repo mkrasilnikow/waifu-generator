@@ -209,7 +209,7 @@
     // ── waifu.im ──
     async function fetchFromWaifuIm() {
         const params = new URLSearchParams();
-        params.set("is_nsfw", isNsfw.toString());
+        params.set("isnsfw", isNsfw.toString());
 
         selectedTags.forEach((tag) => params.append("included_tags", tag));
 
@@ -271,35 +271,68 @@
         metaInfo.innerHTML = `${type} / ${category}`;
     }
 
+    // ── Build low-res preview URL via images.weserv.nl ──
+    // weserv resizes to max 1024px on either side and serves with CORS headers.
+    // currentUrl always stays as the original full-resolution URL for download.
+    function previewUrl(originalUrl) {
+        const encoded = encodeURIComponent(originalUrl.replace(/^https?:\/\//, ""));
+        return `https://images.weserv.nl/?url=${encoded}&w=1024&h=1024&fit=inside&output=webp`;
+    }
+
     // ── Load image into DOM ──
     function loadImage(url) {
         mainImage.classList.remove("loaded");
+        // weserv proxy sends Access-Control-Allow-Origin: * so we can use crossOrigin
+        mainImage.crossOrigin = "anonymous";
 
         const img = new Image();
         img.crossOrigin = "anonymous";
+        const preview = previewUrl(url);
 
         img.onload = () => {
-            mainImage.src = url;
+            mainImage.src = preview;
             mainImage.classList.add("loaded");
             hideLoader();
             downloadBtn.disabled = false;
         };
 
         img.onerror = () => {
-            showError();
-            hideLoader();
+            // Fallback: try original URL without crossOrigin
+            const fallback = new Image();
+            fallback.onload = () => {
+                mainImage.crossOrigin = null;
+                mainImage.src = url;
+                mainImage.classList.add("loaded");
+                hideLoader();
+                downloadBtn.disabled = false;
+            };
+            fallback.onerror = () => {
+                showError();
+                hideLoader();
+            };
+            fallback.src = url;
         };
 
-        img.src = url;
+        img.src = preview;
     }
 
     // ── Download ──
+    // Always downloads the original full-resolution URL (currentUrl).
+    // For waifu.im — direct fetch (CORS supported).
+    // For waifu.pics — fetch via weserv proxy which adds CORS headers.
     async function downloadImage() {
         if (!currentUrl) return;
 
         downloadBtn.disabled = true;
         try {
-            const res = await fetch(currentUrl, { mode: "cors" });
+            let fetchUrl = currentUrl;
+            if (currentApi !== "waifuim") {
+                // waifu.pics CDN has no CORS — fetch full-res through weserv proxy.
+                // No size/format params: weserv passes through the original file unchanged.
+                const encoded = encodeURIComponent(currentUrl.replace(/^https?:\/\//, ""));
+                fetchUrl = `https://images.weserv.nl/?url=${encoded}`;
+            }
+            const res = await fetch(fetchUrl, { mode: "cors" });
             const blob = await res.blob();
             const ext = getExtension(currentUrl, blob.type);
             const a = document.createElement("a");
